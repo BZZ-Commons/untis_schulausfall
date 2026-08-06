@@ -20,6 +20,7 @@ import {
   isDraftSchoolYear,
   findDefaultSchoolYear,
   isPreviewGateOpen,
+  selectableSchoolYears,
 } from '@/src/lib/schoolYear';
 import { writeLastSelection } from '@/src/lib/lastSelection';
 import { useMeasuredHeight } from '@/src/lib/useMeasuredHeight';
@@ -197,6 +198,11 @@ export default function HomePage() {
   // with the API route's server-side gate via isPreviewGateOpen.
   const previewAllowed = isPreviewGateOpen(selectedSchoolYear, Date.now());
 
+  // Abgeschlossene Schuljahre verschwinden aus dem Dropdown; die volle Liste bleibt
+  // erhalten (isDraftSchoolYear braucht das Vorjahr, Deep-Links dessen Kurzform).
+  // Wie oben inline statt memoized, damit es dem aktuellen Datum folgt.
+  const dropdownSchoolYears = selectableSchoolYears(schoolYears, Date.now(), selectedSchoolYearId);
+
   // Only surface a companion in the header for single-companion merges (length 2).
   // Multi-companion classes (e.g. AB c → IA a+b) fall back to longName.
   const selectedCompanion =
@@ -273,10 +279,10 @@ export default function HomePage() {
             </div>
           </a>
 
-          {schoolYears.length >= 2 && (
+          {dropdownSchoolYears.length >= 2 && (
             <div className="sm:ml-auto">
               <SchoolYearSelector
-                schoolYears={schoolYears}
+                schoolYears={dropdownSchoolYears}
                 selectedId={selectedSchoolYearId}
                 onChange={handleSchoolYearChange}
               />

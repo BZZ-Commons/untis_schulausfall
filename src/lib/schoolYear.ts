@@ -68,6 +68,27 @@ export function isPreviewGateOpen(year: SchoolYearSummary | undefined, now: numb
   return isPreviewWindowOpen(year, now);
 }
 
+/** Whether the school year is over (its end date lies before `now`). */
+export function isFinishedSchoolYear(year: SchoolYearSummary, now: number): boolean {
+  return new Date(year.endDate).getTime() < now;
+}
+
+/**
+ * The school years offered in the dropdown: finished years drop out, since their
+ * plan is history and only the running/upcoming years are worth switching to.
+ *
+ * `keepId` (the currently selected year) is always kept so a deep link to a
+ * finished year still matches an `<option>` instead of silently showing another
+ * year's label.
+ */
+export function selectableSchoolYears(
+  years: ReadonlyArray<SchoolYearSummary>,
+  now: number,
+  keepId?: number | null,
+): SchoolYearSummary[] {
+  return years.filter((y) => !isFinishedSchoolYear(y, now) || y.id === keepId);
+}
+
 /** The school year whose date range contains `date` (epoch ms), or undefined if none. */
 export function findSchoolYearForDate(
   years: ReadonlyArray<SchoolYearSummary>,

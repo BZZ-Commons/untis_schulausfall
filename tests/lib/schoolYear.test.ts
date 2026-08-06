@@ -7,6 +7,8 @@ import {
   findSchoolYearForDate,
   isPreviewWindowOpen,
   isPreviewGateOpen,
+  isFinishedSchoolYear,
+  selectableSchoolYears,
 } from '@/src/lib/schoolYear';
 import type { SchoolYearSummary } from '@/src/types';
 
@@ -98,6 +100,41 @@ describe('findSchoolYearForDate', () => {
   it('returns undefined for a date outside every year (e.g. summer break)', () => {
     // Between YEAR_2526 end (2026-07-15) and YEAR_2627 start (2026-08-16).
     expect(findSchoolYearForDate(YEARS, at('2026-08-01T00:00:00.000Z'))).toBeUndefined();
+  });
+});
+
+describe('isFinishedSchoolYear', () => {
+  it('is true only after the end date', () => {
+    expect(isFinishedSchoolYear(YEAR_2526, at('2026-07-15T21:00:00.000Z'))).toBe(false);
+    expect(isFinishedSchoolYear(YEAR_2526, at('2026-08-06T00:00:00.000Z'))).toBe(true);
+    expect(isFinishedSchoolYear(YEAR_2627, at('2026-08-06T00:00:00.000Z'))).toBe(false);
+  });
+});
+
+describe('selectableSchoolYears', () => {
+  // Real lists come newest first (see fetchSchoolYearSummaries).
+  const NEWEST_FIRST = [YEAR_2627, YEAR_2526];
+
+  it('drops finished years', () => {
+    expect(selectableSchoolYears(NEWEST_FIRST, at('2026-08-06T00:00:00.000Z'))).toEqual([
+      YEAR_2627,
+    ]);
+  });
+
+  it('keeps every year while none has ended', () => {
+    expect(selectableSchoolYears(NEWEST_FIRST, at('2026-06-11T00:00:00.000Z'))).toEqual(
+      NEWEST_FIRST,
+    );
+  });
+
+  it('keeps the selected year even when it is finished (deep link)', () => {
+    expect(
+      selectableSchoolYears(NEWEST_FIRST, at('2026-08-06T00:00:00.000Z'), YEAR_2526.id),
+    ).toEqual(NEWEST_FIRST);
+  });
+
+  it('returns an empty list when every year has ended', () => {
+    expect(selectableSchoolYears(NEWEST_FIRST, at('2030-01-01T00:00:00.000Z'))).toEqual([]);
   });
 });
 

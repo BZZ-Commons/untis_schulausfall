@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.2.11",
+    "date": "2026-08-06",
+    "changes": [
+      "Abgeschlossene Schuljahre erscheinen nicht mehr in der Schuljahr-Auswahl – sichtbar sind nur noch das laufende und das kommende Schuljahr. Ein geteilter Link auf ein bereits beendetes Schuljahr funktioniert weiterhin und zeigt dieses Schuljahr dann auch in der Auswahl an."
+    ]
+  },
+  {
     "version": "1.2.10",
     "date": "2026-07-13",
     "changes": [
